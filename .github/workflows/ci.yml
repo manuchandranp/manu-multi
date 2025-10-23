@@ -3,69 +3,52 @@ on:
   push:
     branches: main
 
-env:
-  JFROG_URL: https://hts2.jfrog.io
-  NPM_REPOSITORY: manu-npm-virtual
-  ARTIFACT_REPOSITORY: manu-generic-local
-  ARTIFACT_TARGET_PATH: my-project/v1/latest
-
 jobs:
-  # Job to run your tests/build that generates an artifact
   build-and-test:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
+      - name: Checkout Repository
         uses: actions/checkout@v4
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '24'
-      - name: Install dependencies
+          node-version: '14'
+
+      - name: Install Dependencies
         run: npm install
-      - name: Run tests (or build)
+
+      - name: Run Tests
         run: |
           echo "Running tests..."
+          # Replace with your actual test command.
+          
+      - name: Build Project
+        run: |
+          echo "Building the project..."
           mkdir -p dist
           echo "Build content" > dist/artifact.txt
-          echo "Tests passed and build finished."
+
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
           name: built-project-artifact
           path: dist/
-
-  # Job to publish the NPM package using npm-publish.yml
+  
   publish-npm:
     name: Publish NPM
     needs: build-and-test
     runs-on: ubuntu-latest
     steps:
-      - name: Use npm-publish workflow
-        uses: ./.github/workflows/npm-publish.yml
-        with:
-          jfrog-npm-repository: ${{ env.NPM_REPOSITORY }}
-          jfrog-url: ${{ env.JFROG_URL }}
-          node-version: '24'
-          package-json-file-path: 'package.json'
-          prerelease: ${{ github.ref != 'refs/heads/main' }}
-          npm-distribution-tag: ${{ github.ref == 'refs/heads/main' && 'latest' || '' }}
-        env:
-          JFROG_ACCESS_TOKEN: ${{ secrets.JFROG_ACCESS_TOKEN }}  # Load the token as environment variable
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
-  # Job to upload the built artifact using jfrog-artifact-upload.yml
-  upload-artifact:
-    name: Upload to JFrog
-    needs: build-and-test
-    runs-on: ubuntu-latest
-    steps:
-      - name: Use jfrog-artifact-upload workflow
-        uses: ./.github/workflows/jfrog-artifact-upload.yml
+      - name: Use npm-publish workflow
+        uses: ./.github/actions/npm-publish
         with:
-          jfrog-url: ${{ env.JFROG_URL }}
-          jfrog-repository: ${{ env.ARTIFACT_REPOSITORY }}
-          workflow-artifact-name: built-project-artifact
-          artifact-target-path: ${{ env.ARTIFACT_TARGET_PATH }}
-          artifact-source-path: temp/built-project-artifact/dist/
-          archive-artifact: 'zip'
+          jfrog-npm-repository: manu-npm-virtual
+          jfrog-url: https://hts2.jfrog.io
+          node-version: '14'
+          package-json-file-path: package.json
         env:
-          JFROG_ACCESS_TOKEN: ${{ secrets.JFROG_ACCESS_TOKEN }}  # Load the token as environment variable
+          JFROG_ACCESS_TOKEN: ${{ secrets.JFROG_ACCESS_TOKEN }}  # Use secrets for access token
