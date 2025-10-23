@@ -1,0 +1,21 @@
+name: 'NPM Publish Action'
+description: 'Publishes an NPM package to a JFrog Artifactory.'
+author: 'Your Name'
+
+inputs:
+  jfrog-npm-repository:
+    description: 'The name of the JFrog NPM repository to publish to.'
+    required: true
+  jfrog-url:
+    description: 'The URL of the JFrog Artifactory.'
+    required: true
+  node-version:
+    description: 'Node.js version to use.'
+    required: true
+  package-json-file-path:
+    description: 'Path to the package.json file.'
+    required: true
+
+runs:
+  using: 'node12'
+  main: 'lib/index.js'
