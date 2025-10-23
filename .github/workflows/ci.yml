@@ -44,7 +44,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Use npm-publish workflow
-        uses: ./manu-multi/.github/workflows/npm-publish.yml
+        uses: ./.github/workflows/npm-publish.yml
         with:
           jfrog-npm-repository: manu-npm-virtual
           jfrog-url: https://hts2.jfrog.io
