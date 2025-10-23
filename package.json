@@ -1,0 +1,11 @@
+{
+  "name": "npm-publish-action",
+  "version": "1.0.0",
+  "main": "lib/index.js",
+  "scripts": {
+    "build": "echo 'No build necessary'"
+  },
+  "dependencies": {
+    "@actions/core": "^1.2.6"
+  }
+}
