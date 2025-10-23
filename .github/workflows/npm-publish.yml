@@ -1,5 +1,4 @@
 name: Publish NPM
-
 on:
   workflow_call:
     inputs:
