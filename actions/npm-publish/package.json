@@ -1,0 +1,18 @@
+{
+  "name": "npm-publish-action",
+  "version": "1.0.0",
+  "description": "A GitHub Action for publishing NPM packages to JFrog Artifactory.",
+  "main": "lib/index.js",
+  "scripts": {
+    "build": "echo 'No build step for this action.'"
+  },
+  "dependencies": {
+    "@actions/core": "^1.10.0"
+  },
+  "devDependencies": {
+    "jest": "^27.0.0"  // Optional: Only if you want to set up tests for your action
+  },
+  "bin": {
+    "index": "lib/index.js"
+  }
+}
