@@ -1,4 +1,5 @@
 name: Publish NPM
+
 on:
   workflow_call:
     inputs:
@@ -14,51 +15,24 @@ on:
       package-json-file-path:
         required: true
         type: string
-      prerelease:
-        required: false
-        type: boolean
-      npm-distribution-tag:
-        required: false
-        type: string
     secrets:
-      jfrog-access-token:  # This must be declared for secrets to be passed to the workflow
+      jfrog-access-token:
         required: true
 
 jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
+      - name: Checkout Repository
         uses: actions/checkout@v4
-        
+      
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ inputs.node-version }}
-
+          
       - name: Publish Package to NPM
         run: |
           npm config set registry ${{ inputs.jfrog-url }}
-          npm config set //{{ inputs.jfrog-url }}:_authToken=${{ secrets.jfrog-access-token }}
-          npm publish --registry ${{ inputs.jfrog-url }} --access public
-  publish-npm:
-  name: Publish NPM
-  needs: build-and-test
-  runs-on: ubuntu-latest
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-      
-    - name: Use npm-publish workflow
-      uses: ./.github/workflows/npm-publish.yml
-      with:
-        jfrog-npm-repository: ${{ env.NPM_REPOSITORY }}
-        jfrog-url: ${{ env.JFROG_URL }}
-        node-version: '24'
-        package-json-file-path: 'package.json'
-        prerelease: ${{ github.ref != 'refs/heads/main' }}
-        npm-distribution-tag: ${{ github.ref == 'refs/heads/main' && 'latest' || '' }}
-      env:
-        JFROG_ACCESS_TOKEN: ${{ secrets.JFROG_ACCESS_TOKEN }}  # Use secrets for access token        
-          
-          
+          npm config set //${{ inputs.jfrog-url }}:_authToken=${{ secrets.jfrog-access-token }}
+          npm publish ${{ inputs.package-json-file-path }} --registry ${{ inputs.jfrog-url }} --access public
