@@ -42,16 +42,11 @@ jobs:
     name: Publish NPM
     needs: build-and-test
     runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: Call Publish NPM Workflow
-        uses: your-username/your-repo/.github/workflows/npm-publish.yml@main
-        with:
-          jfrog-npm-repository: manu-npm-virtual
-          jfrog-url: https://hts2.jfrog.io
-          node-version: '14'
-          package-json-file-path: package.json
-        env:
-          JFROG_ACCESS_TOKEN: ${{ secrets.JFROG_ACCESS_TOKEN }}
+    uses: your-username/your-repo/.github/workflows/npm-publish.yml@main
+    with:
+      jfrog-npm-repository: manu-npm-virtual
+      jfrog-url: https://hts2.jfrog.io
+      node-version: '14'
+      package-json-file-path: package.json
+    secrets:
+      JFROG_ACCESS_TOKEN: ${{ secrets.JFROG_ACCESS_TOKEN }}
