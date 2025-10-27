@@ -1,3 +1,5 @@
+name: Publish NPM Package to JFrog
+
 on:
   workflow_call:
     inputs:
@@ -12,6 +14,12 @@ on:
         type: string
       package-json-file-path:
         required: true
+        type: string
+      download-artifact:
+        required: false
+        type: boolean
+      artifact-name:
+        required: false
         type: string
       build-name:
         required: false
@@ -30,6 +38,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v5
 
+      - name: (Optional) Download build artifact from earlier job
+        if: ${{ inputs.download-artifact == true }}
+        uses: actions/download-artifact@v5
+        with:
+          name: ${{ inputs.artifact-name }}
+          path: .
+
       - name: Setup Node.js
         uses: actions/setup-node@v5
         with:
@@ -38,7 +53,6 @@ jobs:
       - name: Install JFrog CLI
         run: |
           echo "Installing JFrog CLI..."
-          # Download and install JFrog CLI (official install script)
           curl -fL https://getcli.jfrog.io | sh
           sudo mv jfrog /usr/local/bin/
           jfrog --version
@@ -47,17 +61,19 @@ jobs:
         env:
           JFROG_ACCESS_TOKEN: ${{ secrets.JFROG_ACCESS_TOKEN }}
         run: |
-          # Base Artifactory URL expected to be something like: https://hts2.jfrog.io/artifactory
-          ARTIFACTORY_BASE_URL="${{ inputs['jfrog-url'] }}/artifactory"
-          # Add a non-interactive server config named "artifactory-server"
+          JFROG_URL="${{ inputs['jfrog-url'] }}"
+          # If JFROG_URL already contains "/artifactory", use as-is; otherwise append "/artifactory"
+          if [[ "$JFROG_URL" == *"/artifactory"* ]]; then
+            ARTIFACTORY_BASE_URL="$JFROG_URL"
+          else
+            ARTIFACTORY_BASE_URL="${JFROG_URL}/artifactory"
+          fi
           jfrog config add artifactory-server --url="$ARTIFACTORY_BASE_URL" --access-token="$JFROG_ACCESS_TOKEN" --interactive=false
-          echo "JFrog CLI configured for server id: artifactory-server"
+          echo "JFrog CLI configured for server id: artifactory-server (URL: $ARTIFACTORY_BASE_URL)"
 
       - name: Configure npm auth for JFrog (jfrog rt npm-config)
         run: |
-          # Repository name passed in should be your npm repo in Artifactory, e.g. manu-npm-virtual
           REPO="${{ inputs['jfrog-npm-repository'] }}"
-          # This config writes the correct auth and registry entry to ~/.npmrc for the given repo when using the configured server
           jfrog rt npm-config "$REPO" --server-id=artifactory-server
           echo "npm configured to use Artifactory npm repo: $REPO"
 
@@ -65,9 +81,7 @@ jobs:
         id: pkg
         run: |
           PACKAGE_JSON_PATH="${{ inputs['package-json-file-path'] }}"
-          # If user passed a path like "packages/my-pkg/package.json" or "package.json", derive the directory
           PACKAGE_DIR="$(dirname "$PACKAGE_JSON_PATH")"
-          # Normalize to '.' when package.json is at repo root
           if [ "$PACKAGE_DIR" = "." ]; then
             echo "package_dir=." >> $GITHUB_OUTPUT
           else
@@ -76,8 +90,7 @@ jobs:
 
       - name: Show configured npm registry (safe debug)
         run: |
-          # Show npm registry source (do not reveal auth token)
-          echo "NPM registry configured in ~/.npmrc:"
+          echo "NPM registry configured in ~/.npmrc (showing registry lines only):"
           grep -E 'registry|always-auth' ~/.npmrc || true
 
       - name: Install deps and publish package to Artifactory
@@ -86,25 +99,30 @@ jobs:
         run: |
           set -euo pipefail
           # Compose registry URL (used in --registry for npm publish)
-          REGISTRY_URL="${{ inputs['jfrog-url'] }}/artifactory/api/npm/${{ inputs['jfrog-npm-repository'] }}"
+          # Use the same logic as before re: artifactory path
+          JFROG_URL="${{ inputs['jfrog-url'] }}"
+          if [[ "$JFROG_URL" == *"/artifactory"* ]]; then
+            BASE_URL="$JFROG_URL"
+          else
+            BASE_URL="${JFROG_URL}/artifactory"
+          fi
+          REGISTRY_URL="$BASE_URL/api/npm/${{ inputs['jfrog-npm-repository'] }}"
           echo "Publishing to npm registry: $REGISTRY_URL"
           # Move to package dir
           cd "${{ steps.pkg.outputs.package_dir }}"
           echo "Current working directory: $(pwd)"
-          # Prefer reproducible install
+          # If artifact extraction produced built files in dist/, they are available here because we extracted to repo root
           if [ -f package-lock.json ]; then
             npm ci
           else
             npm install
           fi
-          # Publish using the registry configured above. .npmrc already contains the token from jfrog rt npm-config,
-          # but passing --registry ensures npm hits the correct virtual repo endpoint.
+          # Publish using the registry configured above (jfrog rt npm-config wrote ~/.npmrc with credentials).
           npm publish --registry "$REGISTRY_URL"
 
       - name: (Optional) Record build-info with JFrog CLI
         if: ${{ inputs['build-name'] != '' && inputs['build-number'] != '' }}
         run: |
-          # If you passed build-name and build-number, collect and publish build-info to Artifactory
           jfrog rt bce "${{ inputs['build-name'] }}" "${{ inputs['build-number'] }}"
           jfrog rt bp "${{ inputs['build-name'] }}" "${{ inputs['build-number'] }}" --server-id=artifactory-server
           echo "Build info published for ${{ inputs['build-name'] }} #${{ inputs['build-number'] }}"
