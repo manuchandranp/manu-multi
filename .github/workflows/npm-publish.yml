@@ -113,12 +113,12 @@ jobs:
           echo "Current working directory: $(pwd)"
           # If artifact extraction produced built files in dist/, they are available here because we extracted to repo root
           if [ -f package-lock.json ]; then
-            npm ci
+            jf npm ci
           else
-            npm install
+            jf npm install
           fi
           # Publish using the registry configured above (jfrog rt npm-config wrote ~/.npmrc with credentials).
-          npm publish --registry "$REGISTRY_URL"
+          jf npm publish --registry "$REGISTRY_URL"
 
       - name: (Optional) Record build-info with JFrog CLI
         if: ${{ inputs['build-name'] != '' && inputs['build-number'] != '' }}
