@@ -106,7 +106,7 @@ jobs:
           else
             BASE_URL="${JF_URL}/artifactory"
           fi
-          REGISTRY_URL="$JF_URL/api/npm/${{ inputs['jfrog-npm-repository'] }}"
+          REGISTRY_URL="$JF_URL/artifactory/api/npm/${{ inputs['jfrog-npm-repository'] }}"
           echo "Publishing to npm registry: $REGISTRY_URL"
           # Move to package dir
           cd "${{ steps.pkg.outputs.package_dir }}"
