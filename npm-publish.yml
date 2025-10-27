@@ -1,0 +1,38 @@
+name: Publish NPM
+
+on:
+  workflow_call:
+    inputs:
+      jfrog-npm-repository:
+        required: true
+        type: string
+      jfrog-url:
+        required: true
+        type: string
+      node-version:
+        required: true
+        type: string
+      package-json-file-path:
+        required: true
+        type: string
+    secrets:
+      jfrog-access-token:
+        required: true
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node-version }}
+          
+      - name: Publish Package to NPM
+        run: |
+          npm config set registry ${{ inputs.jfrog-url }}
+          npm config set //${{ inputs.jfrog-url }}:_authToken=${{ secrets.jfrog-access-token }}
+          npm publish ${{ inputs.package-json-file-path }} --registry ${{ inputs.jfrog-url }} --access public
