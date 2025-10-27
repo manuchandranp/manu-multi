@@ -42,6 +42,12 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+      - name: Show Current Directory
+        run: |
+          echo "Current working directory:"
+          pwd
+          echo "Contents of current directory:"
+          ls -la  
 
       - name: Use npm-publish workflow
         uses: ./.github/workflows/npm-publish.yml
