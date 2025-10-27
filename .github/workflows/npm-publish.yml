@@ -54,12 +54,12 @@ jobs:
         uses: jfrog/setup-jfrog-cli@v4
         env:  
            JF_URL: ${{ vars.JF_URL }}
-           JF_ACCESS_TOKEN: ${{ secrets.JF_ACCESS_TOKEN }}
+           JFROG_ACCESS_TOKEN : ${{ secrets.JFROG_ACCESS_TOKEN }}
              jf --version
 
       - name: Configure JFrog CLI server
         env:
-          JF_ACCESS_TOKEN: ${{ secrets.JF_ACCESS_TOKEN }}
+          JFROG_ACCESS_TOKEN : ${{ secrets.JFROG_ACCESS_TOKEN  }}
         run: |
           JFROG_URL="${{ inputs['jfrog-url'] }}"
           # If JFROG_URL already contains "/artifactory", use as-is; otherwise append "/artifactory"
@@ -68,7 +68,7 @@ jobs:
           else
             ARTIFACTORY_BASE_URL="${JFROG_URL}/artifactory"
           fi
-          jf config add artifactory-server --url="$JF_URL" --access-token="$JF_ACCESS_TOKEN" --interactive=false
+          jf config add artifactory-server --url="$JF_URL" --access-token="$JFROG_ACCESS_TOKEN " --interactive=false
           echo "JFrog CLI configured for server id: artifactory-server (URL: $JF_URL)"
 
       - name: Configure npm auth for JFrog (jfrog rt npm-config)
@@ -95,7 +95,7 @@ jobs:
 
       - name: Install deps and publish package to Artifactory
         env:
-          JF_ACCESS_TOKEN: ${{ secrets.JF_ACCESS_TOKEN }}
+          JFROG_ACCESS_TOKEN : ${{ secrets.JFROG_ACCESS_TOKEN  }}
         run: |
           set -euo pipefail
           # Compose registry URL (used in --registry for npm publish)
