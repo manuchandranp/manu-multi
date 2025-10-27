@@ -10,10 +10,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: '14'
 
@@ -33,18 +33,17 @@ jobs:
           echo "Build content" > dist/artifact.txt
 
       - name: Upload Artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: built-project-artifact
           path: dist/
 
   publish-npm:
-    name: Publish NPM
     needs: build-and-test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Call Publish NPM Workflow
         uses: ./.github/workflows/npm-publish.yml  # Correct way to reference a reusable workflow
@@ -52,6 +51,6 @@ jobs:
           jfrog-npm-repository: manu-npm-virtual
           jfrog-url: https://hts2.jfrog.io
           node-version: '14'
-          package-json-file-path: package.json
+          package-json-file-path: manuchandranp/manu-multi/package.json
         env:
           JFROG_ACCESS_TOKEN: ${{ secrets.JFROG_ACCESS_TOKEN }}
