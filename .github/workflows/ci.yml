@@ -42,13 +42,14 @@ jobs:
           ls -la     
   
   publish-npm:
+    name: Publish NPM
+    needs: build-and-test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Publish NPM
-        id: build-and-test
+      - name: Use npm-publish workflow
         uses: ./.github/workflows/npm-publish.yml
         with:
           jfrog-npm-repository: manu-npm-virtual
