@@ -47,7 +47,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Call Publish NPM Workflow
-        uses: ./.github/workflows/npm-publish.yml
+        uses: your-username/your-repo/.github/workflows/npm-publish.yml@main
         with:
           jfrog-npm-repository: manu-npm-virtual
           jfrog-url: https://hts2.jfrog.io
