@@ -74,7 +74,7 @@ jobs:
       - name: Configure npm auth for JFrog (jfrog rt npm-config)
         run: |
           REPO="${{ inputs['jfrog-npm-repository'] }}"
-          jf npm-config "$REPO" --server-id=artifactory-server
+          jf npm-config --repo-deploy "$REPO" --server-id-deploy=artifactory-server
           echo "npm configured to use Artifactory npm repo: $REPO"
 
       - name: Prepare package location
