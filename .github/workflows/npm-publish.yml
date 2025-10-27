@@ -68,8 +68,8 @@ jobs:
           else
             ARTIFACTORY_BASE_URL="${JFROG_URL}/artifactory"
           fi
-          jf config add artifactory-server --url="$ARTIFACTORY_BASE_URL" --access-token="$JFROG_ACCESS_TOKEN" --interactive=false
-          echo "JFrog CLI configured for server id: artifactory-server (URL: $ARTIFACTORY_BASE_URL)"
+          jf config add artifactory-server --url="$JF_URL" --access-token="$JFROG_ACCESS_TOKEN" --interactive=false
+          echo "JFrog CLI configured for server id: artifactory-server (URL: $JF_URL)"
 
       - name: Configure npm auth for JFrog (jfrog rt npm-config)
         run: |
