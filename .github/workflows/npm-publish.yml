@@ -74,7 +74,7 @@ jobs:
       - name: Configure npm auth for JFrog (jfrog rt npm-config)
         run: |
           REPO="${{ inputs['jfrog-npm-repository'] }}"
-          jf rt npm-config "$REPO" --server-id=artifactory-server
+          jf npm-config "$REPO" --server-id=artifactory-server
           echo "npm configured to use Artifactory npm repo: $REPO"
 
       - name: Prepare package location
@@ -123,6 +123,6 @@ jobs:
       - name: (Optional) Record build-info with JFrog CLI
         if: ${{ inputs['build-name'] != '' && inputs['build-number'] != '' }}
         run: |
-          jfrog rt bce "${{ inputs['build-name'] }}" "${{ inputs['build-number'] }}"
-          jfrog rt bp "${{ inputs['build-name'] }}" "${{ inputs['build-number'] }}" --server-id=artifactory-server
+          jf rt bce "${{ inputs['build-name'] }}" "${{ inputs['build-number'] }}"
+          jf rt bp "${{ inputs['build-name'] }}" "${{ inputs['build-number'] }}" --server-id=artifactory-server
           echo "Build info published for ${{ inputs['build-name'] }} #${{ inputs['build-number'] }}"
