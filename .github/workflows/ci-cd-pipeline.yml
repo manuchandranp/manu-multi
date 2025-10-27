@@ -54,4 +54,4 @@ jobs:
       build-name: "${{ github.repository }}"
       build-number: "${{ github.run_id }}"
     secrets:
-      JFROG_ACCESS_TOKEN: ${{ secrets.JFROG_ACCESS_TOKEN }}
+      JF_ACCESS_TOKEN: ${{ secrets.JF_ACCESS_TOKEN }}
