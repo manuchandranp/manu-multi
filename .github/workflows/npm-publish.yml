@@ -55,7 +55,7 @@ jobs:
           echo "Installing JFrog CLI..."
           curl -fL https://getcli.jfrog.io | sh
           sudo mv jfrog /usr/local/bin/
-          jfrog --version
+          jf --version
 
       - name: Configure JFrog CLI server
         env:
@@ -68,13 +68,13 @@ jobs:
           else
             ARTIFACTORY_BASE_URL="${JFROG_URL}/artifactory"
           fi
-          jfrog config add artifactory-server --url="$ARTIFACTORY_BASE_URL" --access-token="$JFROG_ACCESS_TOKEN" --interactive=false
+          jf config add artifactory-server --url="$ARTIFACTORY_BASE_URL" --access-token="$JFROG_ACCESS_TOKEN" --interactive=false
           echo "JFrog CLI configured for server id: artifactory-server (URL: $ARTIFACTORY_BASE_URL)"
 
       - name: Configure npm auth for JFrog (jfrog rt npm-config)
         run: |
           REPO="${{ inputs['jfrog-npm-repository'] }}"
-          jfrog rt npm-config "$REPO" --server-id=artifactory-server
+          jf rt npm-config "$REPO" --server-id=artifactory-server
           echo "npm configured to use Artifactory npm repo: $REPO"
 
       - name: Prepare package location
