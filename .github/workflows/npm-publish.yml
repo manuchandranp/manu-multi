@@ -68,8 +68,8 @@ jobs:
           else
             ARTIFACTORY_BASE_URL="${JFROG_URL}/artifactory"
           fi
-          jf config add artifactory-server --url="$JF_URL" --access-token="$JFROG_ACCESS_TOKEN " --interactive=false
-          echo "JFrog CLI configured for server id: artifactory-server (URL: $JF_URL)"
+          jf config add artifactory-server --url="$JFROG_UR" --access-token="$JFROG_ACCESS_TOKEN " --interactive=false
+          echo "JFrog CLI configured for server id: artifactory-server (URL: $JFROG_UR)"
 
       - name: Configure npm auth for JFrog (jfrog rt npm-config)
         run: |
@@ -101,12 +101,12 @@ jobs:
           # Compose registry URL (used in --registry for npm publish)
           # Use the same logic as before re: artifactory path
           JF_URL="${{ inputs['jfrog-url'] }}"
-          if [[ "$JF_URL" == *"/artifactory"* ]]; then
-            BASE_URL="$JF_URL"
+          if [[ "$JFROG_UR" == *"/artifactory"* ]]; then
+            BASE_URL="$JFROG_UR"
           else
-            BASE_URL="${JF_URL}/artifactory"
+            BASE_URL="${JFROG_UR}/artifactory"
           fi
-          REGISTRY_URL="$JF_URL/artifactory/api/npm/${{ inputs['jfrog-npm-repository'] }}"
+          REGISTRY_URL="$BASE_URL/artifactory/api/npm/${{ inputs['jfrog-npm-repository'] }}"
           echo "Publishing to npm registry: $REGISTRY_URL"
           # Move to package dir
           cd "${{ steps.pkg.outputs.package_dir }}"
