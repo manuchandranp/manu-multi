@@ -50,12 +50,12 @@ jobs:
         with:
           node-version: ${{ inputs['node-version'] }}
 
-      - name: Install JFrog CLI
-        run: |
-          echo "Installing JFrog CLI..."
-          curl -fL https://getcli.jfrog.io | sh
-          sudo mv jfrog /usr/local/bin/
-          jf --version
+      - name: Setup JFrog CLI
+        uses: jfrog/setup-jfrog-cli@v4
+        env:  
+           JF_URL: ${{ vars.JF_URL }}
+           JF_ACCESS_TOKEN: ${{ secrets.JF_ACCESS_TOKEN }}
+             jf --version
 
       - name: Configure JFrog CLI server
         env:
