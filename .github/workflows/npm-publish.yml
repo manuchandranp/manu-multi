@@ -16,7 +16,7 @@ on:
         required: true
         type: string
     secrets:
-      jfrog-access-token:
+      JFROG_ACCESS_TOKEN:
         required: true
 
 jobs:
@@ -25,14 +25,14 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ inputs.node-version }}
-          
-      - name: Publish Package to NPM
+
+      - name: Publish Package
         run: |
           npm config set registry ${{ inputs.jfrog-url }}
-          npm config set //${{ inputs.jfrog-url }}:_authToken=${{ secrets.jfrog-access-token }}
-          npm publish ${{ inputs.package-json-file-path }} --registry ${{ inputs.jfrog-url }} --access public
+          npm config set //${{ inputs.jfrog-url }}/:_authToken=${{ secrets.JFROG_ACCESS_TOKEN }}
+          npm publish ${{ inputs.package-json-file-path }}
