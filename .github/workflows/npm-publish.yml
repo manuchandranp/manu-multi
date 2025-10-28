@@ -118,7 +118,7 @@ jobs:
             jf npm install
           fi
           # Publish using the registry configured above (jfrog rt npm-config wrote ~/.npmrc with credentials).
-          jf rt npmp publish --registry "$REGISTRY_URL"
+          jf npm publish --registry "$REGISTRY_URL" --verbose
 
       - name: (Optional) Record build-info with JFrog CLI
         if: ${{ inputs['build-name'] != '' && inputs['build-number'] != '' }}
